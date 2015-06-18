@@ -33,8 +33,8 @@
 			<a href="Book/Scarlet">Scarlet Letter</a><br/>
 			
 			<form ng-submit="check_cred(credentials)">
-				<input type="text" ng-model="username" placeholder="Username">
-				<input type="password" ng-model="password" placeholder="Password">
+				<input type="text" ng-model="credentials.username" placeholder="Username">
+				<input type="password" ng-model="credentials.password" placeholder="Password">
 				<button >Login</button>
 			</form>
 			

@@ -2,25 +2,49 @@
 	'use strict';
 	angular.module('ichangapp', ['ngRoute'])
 	
-	.controller('ichangcontroller_main', function($scope, $route, $routeParams, $location,LoginService) {
-		$scope.credentials = {
+	.controller('ichangcontroller_main', function($scope,$rootScope, $route, $routeParams, $location,$http,LoginService) {
+		$scope.credentialsentials = {
 			username : '',
 			password : ''
 		};
 		$scope.$route = $route;
 		$scope.$location = $location;
 		$scope.$routeParams = $routeParams;
+		$rootScope.allow = "";
 		$scope.check_cred = function(credentials){
-			alert(LoginService.check(credentials));
-			
-		}
+			LoginService.check(credentials);
+		};	
 	})
-	.factory('LoginService',function(){
-		var obj = {};
-		obj.check = function(cred){
-			return true;
-		}
-		return obj;
+	.service('LoginService',function($http,$rootScope,Session,$location){
+		//var obj = {};
+		this.check = function(credentials){
+			var url = 'http://localhost:81/route/check.php?username='+credentials.username+'&password='+credentials.password;
+			$http.get(url).success(
+			function(listen){
+				alert(listen);
+				if(listen == "trueadmin")
+					Session.create(credentials,1);
+				else if(listen == "true")
+					Session.create(credentials,0);
+				else{
+					alert("Nope");
+					$location.path('/');
+				}
+			}
+			);
+		};
+		//return obj;
+	})
+	.service('Session',function(){
+		this.create = function(credentials,role){
+			this.username = credentials.username;
+			this.role = role;
+			alert("Session created");
+		};
+		this.destroy = function(){
+			this.username = null;
+			this.role = null;
+		};
 	})
 	.controller('BookController', function($scope, $routeParams) {
 		$scope.name = "BookController";
