@@ -1,0 +1,11 @@
+@mixin center($dir,$align,$justify)
+{
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: $dir;
+	flex-direction: $dir;
+	-webkit-align-items: $align;
+	align-items: $align;
+	-webkit-justify-content: $justify;
+	justify-content: $justify;
+}

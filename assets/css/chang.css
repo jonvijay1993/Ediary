@@ -1,0 +1,43 @@
+@font-face {
+  font-family: aller;
+  src: url(../fonts/Aller.ttf); }
+@font-face {
+  font-family: aller_light;
+  src: url(../fonts/Aller_Lt.ttf); }
+.no_rounded_edges {
+  border-radius: 0px; }
+
+.settings_button {
+  border-radius: 10px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0);
+  transition: all 0.5s ease; }
+
+.coloured_icon:hover {
+  color: white; }
+
+.settings_button:active {
+  border: none;
+  outline: none; }
+
+.settings_button:focus {
+  border: none;
+  outline: none; }
+
+.footer_text {
+  color: rgba(255, 255, 255, 0.2) !important; }
+
+.navbar a:hover {
+  text-decoration: none !important;
+  color: white; }
+
+#container {
+  float: none;
+  margin-left: auto;
+  margin-right: auto; }
+
+.player_container {
+  width: 100%;
+  display: block; }
+
+/*# sourceMappingURL=chang.css.map */
