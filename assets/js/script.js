@@ -16,16 +16,15 @@
 		};	
 	})
 	.service('LoginService',function($http,$rootScope,Session,$location){
-		//var obj = {};
 		this.check = function(credentials){
 			var url = 'http://localhost:81/route/check.php?username='+credentials.username+'&password='+credentials.password;
 			$http.get(url).success(
 			function(listen){
 				alert(listen);
 				if(listen == "trueadmin")
-					Session.create(credentials,1);
+				Session.create(credentials,1);
 				else if(listen == "true")
-					Session.create(credentials,0);
+				Session.create(credentials,0);
 				else{
 					alert("Nope");
 					$location.path('/');
@@ -33,7 +32,6 @@
 			}
 			);
 		};
-		//return obj;
 	})
 	.service('Session',function(){
 		this.create = function(credentials,role){
