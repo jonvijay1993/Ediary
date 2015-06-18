@@ -1,8 +1,16 @@
 (function(angular) {
 	'use strict';
-	angular.module('ichangapp', ['ngRoute'])
+	angular.module('ichangapp', ['ngRoute','ngCookies'])
 	
-	.controller('ichangcontroller_main', function($scope,$rootScope, $route, $routeParams, $location,$http,LoginService) {
+	.controller('ichangcontroller_main', function($scope,$rootScope, $route, $routeParams, $location,$http,LoginService,Session,$cookieStore) {
+		
+		/* if($cookieStore.get('username') !== undefined){
+			$scope.credentials.username = $cookieStore.get('username');
+			$scope.credentials.password = $cookieStore.get('password');
+			Session.create($scope.credentials);
+			$location.path('/about');
+		} */
+		
 		$scope.credentialsentials = {
 			username : '',
 			password : ''
@@ -33,12 +41,14 @@
 			);
 		};
 	})
-	.service('Session',function($location){
+	.service('Session',function($location,$window,$cookieStore,$cookies){
 		this.create = function(credentials,role){
 			this.username = credentials.username;
 			this.role = role;
-			alert("Session created...Moving to Home");
-			$location.path('/home');
+			$cookieStore.put('username',this.username);
+			$cookieStore.put('password',this.password);
+			alert("Session created...Moving to Home" + $cookieStore.get('username'));
+			$location.path('/secure/timeout/30');
 		};
 		this.destroy = function(){
 			this.username = null;
@@ -49,13 +59,21 @@
 				return true;
 			else	
 				return false;
+		};
+		this.getUser = function(){
+			return this.username;
 		}
 	})
 	.controller('BookController', function($scope, $routeParams) {
 		$scope.name = "BookController";
 		$scope.params = $routeParams;
 	})
-	
+	.controller('ichangcontroller_home', function($scope,$routeParams,Session) {
+		$scope.params = $routeParams;
+		$scope.destroy = function(){
+			Session.destroy();
+		};
+	})
 	.controller('ChapterController', function($scope, $routeParams) {
 		$scope.name = "ChapterController";
 		$scope.params = $routeParams;
@@ -75,8 +93,8 @@
 				}
 			}
 		})
-		.when('/home', {
-			templateUrl: 'home.html',
+		.when('/secure/timeout/:timeout', {
+			templateUrl: 'secure.html',
 			controller: 'ichangcontroller_home',
 			resolve:{
 				"check":function(Session,$location){

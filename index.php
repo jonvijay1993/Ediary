@@ -27,7 +27,8 @@
 		<div ng-controller="ichangcontroller_main">
 			Choose:{{user}} 
 			<a href="Book/Moby">Moby</a> |
-			<a href="home">Home</a> |
+			<a href="secure">Home</a> |
+			<a href="index">Index</a> |
 			<a href="Book/Moby/ch/1">Moby: Ch1</a> |
 			<a href="Book/Gatsby">Gatsby</a> |
 			<a href="Book/Gatsby/ch/4?key=value">Gatsby: Ch4</a> |
