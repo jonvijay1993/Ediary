@@ -13,7 +13,7 @@
 		$rootScope.allow = "";
 		$scope.check_cred = function(credentials){
 			LoginService.check(credentials);
-		};	
+		};		
 	})
 	.service('LoginService',function($http,$rootScope,Session,$location){
 		this.check = function(credentials){
@@ -33,16 +33,23 @@
 			);
 		};
 	})
-	.service('Session',function(){
+	.service('Session',function($location){
 		this.create = function(credentials,role){
 			this.username = credentials.username;
 			this.role = role;
-			alert("Session created");
+			alert("Session created...Moving to Home");
+			$location.path('/home');
 		};
 		this.destroy = function(){
 			this.username = null;
 			this.role = null;
 		};
+		this.isset = function(){
+			if(this.username != null)
+				return true;
+			else	
+				return false;
+		}
 	})
 	.controller('BookController', function($scope, $routeParams) {
 		$scope.name = "BookController";
@@ -65,6 +72,19 @@
 					var delay = $q.defer();
 					$timeout(delay.resolve, 1000);
 					return delay.promise;
+				}
+			}
+		})
+		.when('/home', {
+			templateUrl: 'home.html',
+			controller: 'ichangcontroller_home',
+			resolve:{
+				"check":function(Session,$location){
+					if(Session.isset()){}
+					else{
+						alert("Nope");
+						$location.path('/');
+					}
 				}
 			}
 		})
