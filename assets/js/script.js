@@ -11,7 +11,7 @@
 		$scope.$location = $location;
 		$scope.$routeParams = $routeParams;
 		$scope.check_cred = function(credentials){
-			alert();
+			alert(LoginService.check(credentials));
 			
 		}
 	})
