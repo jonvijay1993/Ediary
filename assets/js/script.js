@@ -233,23 +233,11 @@
 	.config(function($routeProvider, $locationProvider) {
 		$routeProvider
 		.when('/signup', {
-			templateUrl: 'signup.html',
+			templateUrl: 'app/signup.html',
 			controller: 'ichangcontroller_signup'
 		})
-		.when('/Book/:bookId', {
-			templateUrl: 'book.html',
-			controller: 'BookController',
-			resolve: {
-				// I will cause a 1 second delay
-				delay: function($q, $timeout) {
-					var delay = $q.defer();
-					$timeout(delay.resolve, 1000);
-					return delay.promise;
-				}
-			}
-		})
 		.when('/secure/timeout/:timeout', {
-			templateUrl: 'secure.html',
+			templateUrl: 'app/secure.html',
 			controller: 'ichangcontroller_home',
 			resolve:{
 				"check":function(Session,$location){
@@ -262,7 +250,7 @@
 			}
 		})
 		.when('/register_fb_user', {
-			templateUrl: 'register_fb_user.html',
+			templateUrl: 'app/register_fb_user.html',
 			controller: 'ichangcontroller_main',
 			resolve:{
 				"check":function(Session,$location,$rootScope){
@@ -273,10 +261,6 @@
 					}
 				}
 			}
-		})
-		.when('/Book/:bookId/ch/:chapterId', {
-			templateUrl: 'chapter.html',
-			controller: 'ChapterController'
 		});
 		
 		// configure html5 to get links working on jsfiddle
