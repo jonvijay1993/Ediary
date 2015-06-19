@@ -29,6 +29,7 @@
 		<div ng-controller="ichangcontroller_main">
 			
 			<div ng-hide="hide_normal_login">
+				<button ng-click="signup()">Sign Up</button>
 				<form ng-submit="check_cred(credentials)">
 					<button type="button" id="login" ng-click="login()">login</button>
 					<input type="text" ng-model="credentials.username" placeholder="Username">

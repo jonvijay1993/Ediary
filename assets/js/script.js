@@ -11,7 +11,7 @@
 		$rootScope.hide_username_input = true;
 		$rootScope.allow_fb_user_to_register = false;
 	})
-	.controller('ichangcontroller_main', function($scope,$rootScope, $route, $routeParams, $location,$http,LoginService,Session,$cookieStore,$window,Facebook) {
+	.controller('ichangcontroller_main', function($scope,$rootScope, $route, $routeParams, $location,$http,LoginService,Session,$cookieStore,$window,Facebook,flip) {
 		
 		$scope.credentials = {
 			username : '',
@@ -33,8 +33,10 @@
 			LoginService.check(credentials);
 		};
 		
-		
-		
+		$scope.signup = function(){
+			flip.hides_true();	
+			$location.path('/signup');
+		}
 		
 		//Facebook api stuff
 		
@@ -142,6 +144,18 @@
 			);
 		};
 	})
+	.service('flip',function($rootScope){
+		this.hides_false = function(){
+			$rootScope.hide_fb_login = false;
+			$rootScope.hide_normal_login = false;
+			$rootScope.hide_username_input = false;
+		};
+		this.hides_true = function(){
+			$rootScope.hide_fb_login = true;
+			$rootScope.hide_normal_login = true;
+			$rootScope.hide_username_input = true;
+		};
+	})
 	.service('Session',function($location,$window,$cookieStore){
 		
 		this.create = function(credentials,role){
@@ -149,9 +163,9 @@
 			this.password = credentials.password;
 			this.role = role;
 			$cookieStore.put('username',this.username);
-			//alert($cookieStore.get('username'));
+			// alert($cookieStore.get('username'));
 			$cookieStore.put('password',this.password);
-			//alert($cookieStore.get('password'));
+			// alert($cookieStore.get('password'));
 			$location.path('/secure/timeout/30');
 		};
 		this.destroy = function(){
@@ -181,6 +195,30 @@
 		$scope.name = "BookController";
 		$scope.params = $routeParams;
 	})
+	.controller('ichangcontroller_signup', function($scope, $routeParams,$http,Session) {
+		$scope.params = $routeParams;
+		$scope.register_new_user = function(){
+			alert("Good");
+			alert($scope.to_register_first_name);
+			var url = 'http://localhost:81/route/register_new_user.php?first_name=' + $scope.to_register_first_name + '&last_name=' + $scope.to_register_last_name + '&username=' + $scope.to_register_username + '&password=' + $scope.to_register_password;
+			alert(url);
+			$http.get(url).success(function(val){
+				if(val.status == "registered")
+				{
+					$scope.credentials.username = val.username;
+					alert($scope.credentials.username);
+					$scope.credentials.password = val.password;
+					Session.create($scope.credentials,val.admin_level);
+				}
+				else{
+					//alert(JSON.stringify(val));
+					$rootScope.hide_username_input = true;
+					$rootScope.allow_fb_user_to_register = false;
+					$location.path('/');
+				}
+			});
+		};
+	})
 	.controller('ichangcontroller_home', function($scope,$routeParams,Session) {
 		$scope.params = $routeParams;
 		$scope.destroy = function(){
@@ -194,6 +232,10 @@
 	
 	.config(function($routeProvider, $locationProvider) {
 		$routeProvider
+		.when('/signup', {
+			templateUrl: 'signup.html',
+			controller: 'ichangcontroller_signup'
+		})
 		.when('/Book/:bookId', {
 			templateUrl: 'book.html',
 			controller: 'BookController',
