@@ -5,8 +5,10 @@
 	.config(function(FacebookProvider) {
 		FacebookProvider.init('841009275982710');
 	})
-	.run(function(){
-		
+	.run(function($rootScope){
+		$rootScope.hide_fb_login = true;
+		$rootScope.hide_normal_login = false;
+		$rootScope.hide_username_input = true;
 	})
 	.controller('ichangcontroller_main', function($scope,$rootScope, $route, $routeParams, $location,$http,LoginService,Session,$cookieStore,$window,Facebook) {
 		
@@ -15,7 +17,6 @@
 			password : ''
 		};		
 		if($cookieStore.get('username') !== null){
-			alert("Hello");
 			//$scope.username = $cookieStore.get('username');
 			//$scope.password = $cookieStore.get('password');
 			//Session.create({username: $scope.username,password:$scope.password,1);
@@ -33,6 +34,7 @@
 		
 		
 		
+		
 		//Facebook api stuff
 		
 		$scope.loginStatus = 'disconnected';
@@ -42,6 +44,9 @@
 		$scope.login = function () {
 			Facebook.login(function(response) {
 				$scope.loginStatus = response.status;
+				$rootScope.hide_normal_login = true;
+				alert("1");
+				$scope.api();
 			});
 		};
 		
@@ -57,9 +62,26 @@
 		
 		$scope.api = function () {
 			Facebook.api('/me', function(response) {
+				alert("2");
 				$scope.user = response;
+				var url = 'http://localhost:81/route/check_fb.php?first_name=' + response.first_name + '&last_name=' + response.last_name;
+				alert("3");
+				if(Facebook.isReady())
+				{
+					alert("Checking with DB");
+					$http.get(url).success(function(val){
+						/* if(val == "exists_on_db")
+						{
+							alert("exists");
+						}
+						else if(val == "new_user"){
+							$rootScope.hide_username_input = false;
+						} */
+						alert(val);
+					});
+				}
 			});
-		};
+			};
 		
 		$scope.$watch(function() {
 			return Facebook.isReady();
@@ -75,7 +97,6 @@
 			var url = 'http://localhost:81/route/check.php?username='+credentials.username+'&password='+credentials.password;
 			$http.get(url).success(
 			function(listen){
-				alert(listen);
 				if(listen == "trueadmin")
 				Session.create(credentials,1);
 				else if(listen == "true")
@@ -94,9 +115,9 @@
 			this.password = credentials.password;
 			this.role = role;
 			$cookieStore.put('username',this.username);
-			alert($cookieStore.get('username'));
+			//alert($cookieStore.get('username'));
 			$cookieStore.put('password',this.password);
-			alert($cookieStore.get('password'));
+			//alert($cookieStore.get('password'));
 			$location.path('/secure/timeout/30');
 		};
 		this.destroy = function(){
@@ -104,8 +125,8 @@
 			this.password = null;
 			$cookieStore.put('username',null);
 			$cookieStore.put('password',null);
-			alert($cookieStore.get('username'));
-			alert($cookieStore.get('password'));
+			//alert($cookieStore.get('username'));
+			//alert($cookieStore.get('password'));
 			
 			this.role = null;
 		};

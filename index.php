@@ -28,29 +28,29 @@
 	<body ng-app="ichangapp">
 		<div ng-controller="ichangcontroller_main">
 			
-			<a href="about">About</a>
-			
-			<form ng-submit="check_cred(credentials)">
-				<input type="text" ng-model="credentials.username" placeholder="Username">
-				<input type="password" ng-model="credentials.password" placeholder="Password">
-				<button >Login</button>
-			</form>
+			<div ng-hide="hide_normal_login">
+				<form ng-submit="check_cred(credentials)">
+					<button type="button" id="login" ng-click="login()">login</button>
+					<input type="text" ng-model="credentials.username" placeholder="Username">
+					<input type="password" ng-model="credentials.password" placeholder="Password">
+					<button >Login</button>
+				</form>
+			</div>
 			
 			<div ng-view></div>
 			
-			<table>
-				<tr>
-					<td>
-						<button type="button" id="login" ng-click="login()">login</button>
-						<button type="button" id="api" ng-click="api()">api user data call</button>
-						<button type="button" id="remove_auth" ng-click="removeAuth()">remove auth</button>
-						<pre>isReady: <span id="is_ready" ng-bind="facebookIsReady"></span></pre>
-						<pre>status: <span id="login_status" ng-bind="loginStatus"></span></pre>
-						<pre>username: <span id="api_first_name" ng-bind="user.first_name"></span></pre>
-					</td>
-				</tr>
-			</table>
-			
+			<div ng-hide="hide_fb_login">
+				<button type="button" id="api" ng-click="api()">api user data call</button>
+				<button type="button" id="remove_auth" ng-click="removeAuth()">remove auth</button>
+				<pre>isReady: <span id="is_ready" ng-bind="facebookIsReady"></span></pre>
+				<pre>status: <span id="login_status" ng-bind="loginStatus"></span></pre>
+				<pre>username: <span id="api_first_name" ng-bind="user.first_name"></span></pre>
+				<div ng-hide="hide_username_input">
+					<input type="text" placeholder="Enter Username">
+					<button ng-click="">Go</button>
 				</div>
-			</body>
-		</html>		
+			</div>
+			
+		</div>
+	</body>
+</html>		
