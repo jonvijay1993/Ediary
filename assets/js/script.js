@@ -9,6 +9,7 @@
 		$rootScope.hide_fb_login = true;
 		$rootScope.hide_normal_login = false;
 		$rootScope.hide_username_input = true;
+		$rootScope.allow_fb_user_to_register = false;
 	})
 	.controller('ichangcontroller_main', function($scope,$rootScope, $route, $routeParams, $location,$http,LoginService,Session,$cookieStore,$window,Facebook) {
 		
@@ -45,7 +46,6 @@
 			Facebook.login(function(response) {
 				$scope.loginStatus = response.status;
 				$rootScope.hide_normal_login = true;
-				alert("1");
 				$scope.api();
 			});
 		};
@@ -62,26 +62,30 @@
 		
 		$scope.api = function () {
 			Facebook.api('/me', function(response) {
-				alert("2");
-				$scope.user = response;
+				$scope.fb_user_response = response;
 				var url = 'http://localhost:81/route/check_fb.php?first_name=' + response.first_name + '&last_name=' + response.last_name;
-				alert("3");
 				if(Facebook.isReady())
 				{
 					alert("Checking with DB");
 					$http.get(url).success(function(val){
-						/* if(val == "exists_on_db")
+						if(val.status == "exists")
 						{
-							alert("exists");
+							$scope.credentials.username = val.username;
+							$scope.credentials.password = val.password;
+							alert(JSON.stringify(val));	
+							Session.create(credentials,val.admin_level);
 						}
-						else if(val == "new_user"){
+						else if(val.status == "new_user"){
 							$rootScope.hide_username_input = false;
-						} */
-						alert(val);
+							$rootScope.allow_fb_user_to_register = true;
+							$location.path('/register_fb_user');
+						}
+						else
+							alert(val);
 					});
 				}
 			});
-			};
+		};
 		
 		$scope.$watch(function() {
 			return Facebook.isReady();
@@ -91,6 +95,25 @@
 			}
 		}
 		);
+		
+		$scope.register_fb_user = function(){
+			
+			var url = 'http://localhost:81/route/register_fb_user.php?first_name=' + $scope.fb_user_response.first_name + '&last_name=' + $scope.fb_user_response.last_name + '&username=' + $scope.fb_user_new_username + '&password=fb_user';
+			$http.get(url).success(function(val){
+				if(val.status == "registered")
+				{
+					$scope.credentials.username = val.username;
+					$scope.credentials.password = val.password;
+					Session.create(credentials,val.admin_level);
+				}
+				else{
+					alert(val);
+					$rootScope.hide_username_input = true;
+					$rootScope.allow_fb_user_to_register = false;
+					$location.path('/');
+				}
+			});
+		}
 	})
 	.service('LoginService',function($http,$rootScope,Session,$location){
 		this.check = function(credentials){
@@ -115,9 +138,9 @@
 			this.password = credentials.password;
 			this.role = role;
 			$cookieStore.put('username',this.username);
-			//alert($cookieStore.get('username'));
+			alert($cookieStore.get('username'));
 			$cookieStore.put('password',this.password);
-			//alert($cookieStore.get('password'));
+			alert($cookieStore.get('password'));
 			$location.path('/secure/timeout/30');
 		};
 		this.destroy = function(){
@@ -175,6 +198,19 @@
 			resolve:{
 				"check":function(Session,$location){
 					if(Session.isset()){}
+					else{
+						alert("Nope");
+						$location.path('/');
+					}
+				}
+			}
+		})
+		.when('/register_fb_user', {
+			templateUrl: 'register_fb_user.html',
+			controller: 'ichangcontroller_main',
+			resolve:{
+				"check":function(Session,$location,$rootScope){
+					if($rootScope.allow_fb_user_to_register){}
 					else{
 						alert("Nope");
 						$location.path('/');

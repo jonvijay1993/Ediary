@@ -45,10 +45,6 @@
 				<pre>isReady: <span id="is_ready" ng-bind="facebookIsReady"></span></pre>
 				<pre>status: <span id="login_status" ng-bind="loginStatus"></span></pre>
 				<pre>username: <span id="api_first_name" ng-bind="user.first_name"></span></pre>
-				<div ng-hide="hide_username_input">
-					<input type="text" placeholder="Enter Username">
-					<button ng-click="">Go</button>
-				</div>
 			</div>
 			
 		</div>

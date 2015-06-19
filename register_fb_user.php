@@ -5,11 +5,16 @@
 	
 	$first_name = $_GET['first_name'];
 	$last_name = $_GET['last_name'];
+	$username= $_GET['username'];
+	$password= $_GET['password'];
 	
-	$query = 'select * from user_accounts_fb where first_name="'.$first_name.'" AND last_name="'.$last_name.'"';
+	$query = 'INSERT INTO `user_accounts_fb`(`first_name`, `last_name`, `username`, `password`, `admin_level`) VALUES ("'.$first_name.'","'.$last_name.'","'.$username.'","'.$password.'",0)';
+	$query_check = 'select * from user_accounts_fb where username="'.$username.'"';
+	echo $query_check;
+	$result = $conn -> query($query) or die(mysql_error($conn));
 	echo $query;
 	$output = "";
-	if(($result = $conn->query($query)) != FALSE)
+	if($result = $conn->query($query_check) != false)
 	{
 		session_start();
 		$data = $result->fetch(PDO::FETCH_ASSOC) or die(mysql_error());
@@ -21,7 +26,7 @@
 			// echo "trueadmin";
 		// else
 		$returns = array(
-			"status" => "exists",
+			"status" => "registered",
 			"username" => $data['username'],
 			"password" => $data['password'],
 			"admin_level" => $data['admin_level']
@@ -32,7 +37,7 @@
 	else{
 		//echo $data->rowCount();
 		$returns = array(
-			"status" => "new_user"
+			"status" => "failed"
 		);
 		$output = json_encode($returns);
 		echo $output;
