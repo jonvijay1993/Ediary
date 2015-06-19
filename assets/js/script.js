@@ -1,27 +1,29 @@
 (function(angular) {
 	'use strict';
-	angular.module('ichangapp', ['ngRoute','ngCookies'])
 	
-	.controller('ichangcontroller_main', function($scope,$rootScope, $route, $routeParams, $location,$http,LoginService,Session,$cookieStore) {
+	angular.module('ichangapp', ['ngRoute','ngCookies'])
+	.controller('ichangcontroller_main', function($scope,$rootScope, $route, $routeParams, $location,$http,LoginService,Session,$cookieStore,$window) {
 		
-		/* if($cookieStore.get('username') !== undefined){
-			$scope.credentials.username = $cookieStore.get('username');
-			$scope.credentials.password = $cookieStore.get('password');
-			Session.create($scope.credentials);
-			$location.path('/about');
-		} */
-		
-		$scope.credentialsentials = {
+		$scope.credentials = {
 			username : '',
 			password : ''
-		};
+		};		
+		if($cookieStore.get('username') !== null){
+			alert("Hello");
+			//$scope.username = $cookieStore.get('username');
+			//$scope.password = $cookieStore.get('password');
+			//Session.create({username: $scope.username,password:$scope.password,1);
+			//$location.path('/about');
+		} 
+		
 		$scope.$route = $route;
 		$scope.$location = $location;
 		$scope.$routeParams = $routeParams;
 		$rootScope.allow = "";
+		
 		$scope.check_cred = function(credentials){
 			LoginService.check(credentials);
-		};		
+		};
 	})
 	.service('LoginService',function($http,$rootScope,Session,$location){
 		this.check = function(credentials){
@@ -44,21 +46,29 @@
 	.service('Session',function($location,$window,$cookieStore,$cookies){
 		this.create = function(credentials,role){
 			this.username = credentials.username;
+			this.password = credentials.password;
 			this.role = role;
 			$cookieStore.put('username',this.username);
+			alert($cookieStore.get('username'));
 			$cookieStore.put('password',this.password);
-			alert("Session created...Moving to Home" + $cookieStore.get('username'));
+			alert($cookieStore.get('password'));
 			$location.path('/secure/timeout/30');
 		};
 		this.destroy = function(){
 			this.username = null;
+			this.password = null;
+			$cookieStore.put('username',null);
+			$cookieStore.put('password',null);
+			alert($cookieStore.get('username'));
+			alert($cookieStore.get('password'));
+			
 			this.role = null;
 		};
 		this.isset = function(){
 			if(this.username != null)
-				return true;
+			return true;
 			else	
-				return false;
+			return false;
 		};
 		this.getUser = function(){
 			return this.username;
