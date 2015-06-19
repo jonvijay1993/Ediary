@@ -66,14 +66,16 @@
 				var url = 'http://localhost:81/route/check_fb.php?first_name=' + response.first_name + '&last_name=' + response.last_name;
 				if(Facebook.isReady())
 				{
-					alert("Checking with DB");
+					//alert("Checking with DB");
 					$http.get(url).success(function(val){
 						if(val.status == "exists")
 						{
+							//alert($scope.credentials.username);
 							$scope.credentials.username = val.username;
+							//alert($scope.credentials.username);
 							$scope.credentials.password = val.password;
-							alert(JSON.stringify(val));	
-							Session.create(credentials,val.admin_level);
+							//alert(JSON.stringify(val));	
+							Session.create($scope.credentials,val.admin_level);
 						}
 						else if(val.status == "new_user"){
 							$rootScope.hide_username_input = false;
@@ -81,7 +83,7 @@
 							$location.path('/register_fb_user');
 						}
 						else
-							alert(val);
+						alert(val);
 					});
 				}
 			});
@@ -104,10 +106,9 @@
 				{
 					$scope.credentials.username = val.username;
 					$scope.credentials.password = val.password;
-					Session.create(credentials,val.admin_level);
+					Session.create($scope.credentials,val.admin_level);
 				}
 				else{
-					alert(val);
 					$rootScope.hide_username_input = true;
 					$rootScope.allow_fb_user_to_register = false;
 					$location.path('/');
@@ -120,10 +121,19 @@
 			var url = 'http://localhost:81/route/check.php?username='+credentials.username+'&password='+credentials.password;
 			$http.get(url).success(
 			function(listen){
-				if(listen == "trueadmin")
-				Session.create(credentials,1);
+				if(listen == "trueadmin"){
+					Session.create(credentials,1);
+					$rootScope.hide_fb_login = true;
+					$rootScope.hide_normal_login = true;
+					$rootScope.hide_username_input = true;
+				}
 				else if(listen == "true")
-				Session.create(credentials,0);
+				{	
+					Session.create(credentials,0);
+					$rootScope.hide_fb_login = true;
+					$rootScope.hide_normal_login = true;
+					$rootScope.hide_username_input = true;
+				}
 				else{
 					alert("Nope");
 					$location.path('/');
@@ -132,15 +142,16 @@
 			);
 		};
 	})
-	.service('Session',function($location,$window,$cookieStore,$cookies){
+	.service('Session',function($location,$window,$cookieStore){
+		
 		this.create = function(credentials,role){
 			this.username = credentials.username;
 			this.password = credentials.password;
 			this.role = role;
 			$cookieStore.put('username',this.username);
-			alert($cookieStore.get('username'));
+			//alert($cookieStore.get('username'));
 			$cookieStore.put('password',this.password);
-			alert($cookieStore.get('password'));
+			//alert($cookieStore.get('password'));
 			$location.path('/secure/timeout/30');
 		};
 		this.destroy = function(){
@@ -150,8 +161,11 @@
 			$cookieStore.put('password',null);
 			//alert($cookieStore.get('username'));
 			//alert($cookieStore.get('password'));
-			
 			this.role = null;
+			// $rootScope.hide_fb_login = false;
+			// $rootScope.hide_normal_login = false;
+			// $rootScope.hide_username_input = false;
+			$window.location.href = 'http://localhost:81/route/index.php';
 		};
 		this.isset = function(){
 			if(this.username != null)

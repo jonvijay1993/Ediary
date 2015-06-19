@@ -7,7 +7,6 @@
 	$last_name = $_GET['last_name'];
 	
 	$query = 'select * from user_accounts_fb where first_name="'.$first_name.'" AND last_name="'.$last_name.'"';
-	echo $query;
 	$output = "";
 	if(($result = $conn->query($query)) != FALSE)
 	{

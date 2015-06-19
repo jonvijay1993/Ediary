@@ -17,7 +17,7 @@
 		$data = $result->fetch(PDO::FETCH_ASSOC) or die(mysql_error());
 		//echo $data->rowCount();
 		//echo $data['username'].' logged in';
-		if($data['admin'] == 1)
+		if($data['admin_level'] == 1)
 			echo "trueadmin";
 		else
 			echo "true";
