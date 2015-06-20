@@ -5,17 +5,37 @@
 	.config(function(FacebookProvider) {
 		FacebookProvider.init('841009275982710');
 	})
-	.run(function($rootScope){
+	.run(function($rootScope,$http){
 		$rootScope.hide_fb_login = true;
 		$rootScope.hide_normal_login = false;
 		$rootScope.hide_username_input = true;
 		$rootScope.allow_fb_user_to_register = false;
+		$rootScope.hide_auto_login = true;
+		$http.get('http://localhost:81/route/check_auto_login.php?type=check').success(function(val){
+			if(val.status == "exists"){
+				$rootScope.auto_login_username = val.username;
+				$rootScope.auto_login_password = val.password;
+				$rootScope.auto_login_admin_level = val.admin_level;
+				$rootScope.hide_auto_login = false;
+				$rootScope.hide_normal_login = true;
+			}
+			else if(val.status == "nope"){
+				$rootScope.hide_auto_login = true;	
+				$rootScope.hide_normal_login = false;
+			}
+			else{
+				alert(val);
+			}
+			
+		});
+		
 	})
 	.controller('ichangcontroller_main', function($scope,$rootScope, $route, $routeParams, $location,$http,LoginService,Session,$cookieStore,$window,Facebook,flip) {
 		
 		$scope.credentials = {
 			username : '',
-			password : ''
+			password : '',
+			remember_me : ''
 		};		
 		if($cookieStore.get('username') !== null){
 			//$scope.username = $cookieStore.get('username');
@@ -70,7 +90,7 @@
 				{
 					//alert("Checking with DB");
 					$http.get(url).success(function(val){
-						if(val.status == "exists")
+						if(JSON.stringify(val).search("exists") != -1)
 						{
 							//alert($scope.credentials.username);
 							$scope.credentials.username = val.username;
@@ -79,7 +99,7 @@
 							//alert(JSON.stringify(val));	
 							Session.create($scope.credentials,val.admin_level);
 						}
-						else if(val.status == "new_user"){
+						else if(JSON.stringify(val).search("new_user") != -1){
 							$rootScope.hide_username_input = false;
 							$rootScope.allow_fb_user_to_register = true;
 							$location.path('/register_fb_user');
@@ -116,20 +136,43 @@
 					$location.path('/');
 				}
 			});
-		}
+		};
+		
+		$scope.auto_login = function(){
+			$scope.credentials.username = $rootScope.auto_login_username;
+			$scope.credentials.password = $rootScope.auto_login_password;
+			Session.create(credentials,$rootScope.auto_login_admin_level);
+		};
+		
+		$scope.forget_me = function(){
+			
+			var url = "http://localhost:81/route/check_auto_login.php?type=forget_me&username=" + $rootScope.auto_login_username;
+			alert(url);  	
+			$http.get(url).success(function(val){
+				if(val.status == "forgotten"){
+					$rootScope.hide_auto_login = true;	
+					$rootScope.hide_normal_login = false;
+					Session.destroy();
+					$window.location.href = "http://localhost:81/route";
+				}
+				else{
+					alert(val);
+				}	
+			});
+		};
 	})
 	.service('LoginService',function($http,$rootScope,Session,$location){
 		this.check = function(credentials){
 			var url = 'http://localhost:81/route/check.php?username='+credentials.username+'&password='+credentials.password;
 			$http.get(url).success(
 			function(listen){
-				if(listen == "trueadmin"){
-					Session.create(credentials,1);
+				if(listen.search("trueadmin") != -1){
 					$rootScope.hide_fb_login = true;
 					$rootScope.hide_normal_login = true;
 					$rootScope.hide_username_input = true;
+					Session.create(credentials,1);
 				}
-				else if(listen == "true")
+				else if(listen.search("true") != -1)
 				{	
 					Session.create(credentials,0);
 					$rootScope.hide_fb_login = true;
@@ -137,7 +180,7 @@
 					$rootScope.hide_username_input = true;
 				}
 				else{
-					alert("Nope");
+					alert("Intruder Alert");
 					$location.path('/');
 				}
 			}
@@ -156,19 +199,34 @@
 			$rootScope.hide_username_input = true;
 		};
 	})
-	.service('Session',function($location,$window,$cookieStore){
+	.service('Session',function($location,$window,$cookieStore,$http){
 		
 		this.create = function(credentials,role){
 			this.username = credentials.username;
 			this.password = credentials.password;
 			this.role = role;
+			this.remember_me = credentials.remember_me;
+			alert(this.remember_me);
 			$cookieStore.put('username',this.username);
-			// alert($cookieStore.get('username'));
+			//alert($cookieStore.get('username'));
 			$cookieStore.put('password',this.password);
-			// alert($cookieStore.get('password'));
+			//alert($cookieStore.get('password'));
+			if(this.remember_me == true){
+				var url = 'http://localhost:81/route/check_auto_login.php?type=remember_me&username=' + this.username;
+				alert(url);
+				$http.get(url).success(function(val){
+					alert(val);
+				});
+			}
 			$location.path('/secure/timeout/30');
 		};
-		this.destroy = function(){
+		this.destroy = function(user){
+			this.to_delete = user;
+			var url = 'http://localhost:81/route/check_auto_login.php?type=forget_me&username=' + this.to_delete;
+				alert(url);
+				$http.get(url).success(function(val){
+					alert(val);
+				});
 			this.username = null;
 			this.password = null;
 			$cookieStore.put('username',null);
@@ -179,7 +237,7 @@
 			// $rootScope.hide_fb_login = false;
 			// $rootScope.hide_normal_login = false;
 			// $rootScope.hide_username_input = false;
-			$window.location.href = 'http://localhost:81/route/index.php';
+			$window.location.href = 'http://localhost:81/route/';
 		};
 		this.isset = function(){
 			if(this.username != null)
@@ -222,7 +280,7 @@
 	.controller('ichangcontroller_home', function($scope,$routeParams,Session) {
 		$scope.params = $routeParams;
 		$scope.destroy = function(){
-			Session.destroy();
+			Session.destroy(Session.getUser());
 		};
 	})
 	.controller('ChapterController', function($scope, $routeParams) {
@@ -243,27 +301,27 @@
 				"check":function(Session,$location){
 					if(Session.isset()){}
 					else{
-						alert("Nope");
-						$location.path('/');
-					}
-				}
-			}
-		})
-		.when('/register_fb_user', {
-			templateUrl: 'app/register_fb_user.html',
-			controller: 'ichangcontroller_main',
-			resolve:{
-				"check":function(Session,$location,$rootScope){
-					if($rootScope.allow_fb_user_to_register){}
-					else{
-						alert("Nope");
-						$location.path('/');
-					}
-				}
-			}
-		});
-		
-		// configure html5 to get links working on jsfiddle
-		$locationProvider.html5Mode(true);
+	alert("Nope");
+	$location.path('/');
+	}
+	}
+	}
+	})
+	.when('/register_fb_user', {
+	templateUrl: 'app/register_fb_user.html',
+	controller: 'ichangcontroller_main',
+	resolve:{
+	"check":function(Session,$location,$rootScope){
+	if($rootScope.allow_fb_user_to_register){}
+	else{
+	alert("Nope");
+	$location.path('/');
+	}
+	}
+	}
 	});
-})(window.angular);
+	
+	// configure html5 to get links working on jsfiddle
+	$locationProvider.html5Mode(true);
+	});
+	})(window.angular);					

@@ -7,6 +7,7 @@
 		
 		<?php 
 			$dom = $_SERVER['SERVER_NAME'];
+			echo '<link rel="shortcut icon" src="http://'.$dom.':81/route/assets/img/monkey.png"></script>';
 			echo '<script src="http://'.$dom.':81/route/assets/js/app.js"></script>';
 			echo '<script src="http://'.$dom.':81/route/assets/js/jquery-2.1.3.min.js"></script>';
 			echo '<script src="http://'.$dom.':81/route/assets/js/angular.min.js"></script>';
@@ -34,7 +35,16 @@
 					<button type="button" id="login" ng-click="login()">login</button>
 					<input type="text" ng-model="credentials.username" placeholder="Username">
 					<input type="password" ng-model="credentials.password" placeholder="Password">
+					<span>Remember Me</span><input type="checkbox" ng-model="credentials.remember_me">
 					<button >Login</button>
+				</form>
+			</div>
+			
+			<div ng-hide="hide_auto_login">
+				<form ng-submit="auto_login()">
+					<span>{{auto_login_username}}</span>
+					<button>Login</button>
+					<input type="button" ng-click="forget_me()" value="Forget me">
 				</form>
 			</div>
 			
@@ -48,6 +58,6 @@
 				<pre>username: <span id="api_first_name" ng-bind="user.first_name"></span></pre>
 			</div>
 			
-		</div>
-	</body>
-</html>		
+			</div>
+			</body>
+			</html>					
