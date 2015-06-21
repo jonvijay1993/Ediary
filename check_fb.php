@@ -6,9 +6,10 @@
 	$first_name = $_GET['first_name'];
 	$last_name = $_GET['last_name'];
 	
-	$query = 'select * from user_accounts_fb where first_name="'.$first_name.'" AND last_name="'.$last_name.'"';
+	$query = "select * from user_accounts_fb where first_name=$first_name AND last_name=$last_name";
 	$output = "";
-	if(($result = $conn->query($query)) != FALSE)
+	
+	if($result = $conn->query($query) != FALSE)
 	{
 		session_start();
 		$data = $result->fetch(PDO::FETCH_ASSOC) or die(mysql_error());
@@ -35,6 +36,5 @@
 		);
 		$output = json_encode($returns);
 		echo $output;
-	}
-	
+	}	
 ?>

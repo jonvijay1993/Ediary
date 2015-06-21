@@ -9,10 +9,21 @@
 	$password= $_GET['password'];
 	
 	$query = 'INSERT INTO `user_accounts_fb`(`first_name`, `last_name`, `username`, `password`, `admin_level`) VALUES ("'.$first_name.'","'.$last_name.'","'.$username.'","'.$password.'",0)';
+	
+	//Query for creating user data table
+	$query_create_user_table = "CREATE TABLE IF NOT EXISTS `user_data_$username` (
+	`id` int(100) NOT NULL AUTO_INCREMENT,
+	`note` longblob NOT NULL,
+	`created` text NOT NULL,
+	`last_edited` text NOT NULL,
+	`time_created` text NOT NULL,
+	`time_modified` text NOT NULL,
+	primary key (id)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+	
 	$query_check = 'select * from user_accounts_fb where username="'.$username.'"';
-	echo $query_check;
 	$result = $conn -> query($query) or die(mysql_error($conn));
-	echo $query;
+	$result = $conn -> query($query_create_user_table) or die(mysql_error($conn));
 	$output = "";
 	if($result = $conn->query($query_check) != false)
 	{

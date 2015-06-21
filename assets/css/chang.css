@@ -1,43 +1,47 @@
-@font-face {
-  font-family: aller;
-  src: url(../fonts/Aller.ttf); }
-@font-face {
-  font-family: aller_light;
-  src: url(../fonts/Aller_Lt.ttf); }
-.no_rounded_edges {
-  border-radius: 0px; }
+.page        {
+    bottom:0px; 
+    padding-top:0px;
+    position:absolute; 
+    text-align:center;
+    top:0px;  
+    width:100%; 
+}
 
-.settings_button {
-  border-radius: 10px;
-  border: none;
-  background-color: rgba(255, 255, 255, 0);
-  transition: all 0.5s ease; }
+@keyframes rotateFall {
+    0%      { transform: rotateZ(0deg); }
+    20%     { transform: rotateZ(10deg); animation-timing-function: ease-out; }
+    40%     { transform: rotateZ(17deg); }
+    60%     { transform: rotateZ(16deg); }
+    100%    { transform: translateY(100%) rotateZ(17deg); }
+}
 
-.coloured_icon:hover {
-  color: white; }
+/* slide in from the bottom */
+@keyframes slideOutLeft {
+    to      { transform: translateX(-100%); }
+}
 
-.settings_button:active {
-  border: none;
-  outline: none; }
+/* rotate out newspaper */
+@keyframes rotateOutNewspaper {
+    to      { transform: translateZ(-3000px) rotateZ(360deg); opacity: 0; }
+}
 
-.settings_button:focus {
-  border: none;
-  outline: none; }
+/* entering animations --------------------------------------- */
+/* scale up */
+@keyframes scaleUp {
+    from    { opacity: 0.3; -webkit-transform: scale(0.8); }
+}
 
-.footer_text {
-  color: rgba(255, 255, 255, 0.2) !important; }
+/* slide in from the right */
+@keyframes slideInRight {
+    from    { transform:translateX(100%); }
+    to      { transform: translateX(0); }
+}
 
-.navbar a:hover {
-  text-decoration: none !important;
-  color: white; }
+/* slide in from the bottom */
+@keyframes slideInUp {
+    from    { transform:translateY(100%); }
+    to      { transform: translateY(0); }
+}
 
-#container {
-  float: none;
-  margin-left: auto;
-  margin-right: auto; }
-
-.player_container {
-  width: 100%;
-  display: block; }
-
-/*# sourceMappingURL=chang.css.map */
+.ng-enter           { animation: scaleUp 0.5s both ease-in; z-index: 8888; }
+.ng-leave           { animation: slideOutLeft 0.5s both ease-in; z-index: 9999; }

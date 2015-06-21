@@ -1,7 +1,22 @@
 
 <div ng-controller="ichangcontroller_home">
-	Hey
-	{{params.timeout}}
-	{{username}}
+	<span>Hey {{username}}</span>
+	<ul>
+		<li>
+			<a href="write_today">
+				Write today's note
+			</a>
+		</li>
+		<li>
+			<a href="personalize">
+				Personalize
+			</a>
+		</li>
+		<li>
+			<a href="view_notes">
+				View Diary Log
+			</a>
+		</li>
+	</ul>
 	<button ng-click="destroy()">Logout</button>
 </div>

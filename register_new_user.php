@@ -9,11 +9,23 @@
 	$password= $_GET['password'];
 	
 	$query = 'INSERT INTO `user_accounts`(`first_name`, `last_name`, `username`, `password`, `admin_level`) VALUES ("'.$first_name.'","'.$last_name.'","'.$username.'","'.$password.'",0)';
+	
+	//Query for creating user data table
+	$query_create_user_table = "CREATE TABLE IF NOT EXISTS `user_data_$username` (
+	`id` int(100) NOT NULL AUTO_INCREMENT,
+	`note` longblob NOT NULL,
+	`created` text NOT NULL,
+	`last_edited` text NOT NULL,
+	`time_created` text NOT NULL,
+	`time_modified` text NOT NULL,
+	primary key (id)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+	
 	$query_check = 'select * from user_accounts where username="'.$username.'"';
 	//$result = $conn->query($query);
 	$output = "";
 	
-	if($result = $conn->query($query) != false)
+	if($result = $conn->query($query) != false && $result = $conn->query($query_create_user_table) != false)
 	{
 		session_start();
 		//$data = $result->fetch(PDO::FETCH_ASSOC) or die(mysql_error());
@@ -22,13 +34,13 @@
 		//echo $data->rowCount();
 		//echo $data['username'].' logged in';
 		// if($data['admin'] == 1)
-			// echo "trueadmin";
+		// echo "trueadmin";
 		// else
 		$returns = array(
-			"status" => "registered",
-			"username" => $username,
-			"password" => $password,
-			"admin_level" => "0"
+		"status" => "registered",
+		"username" => $username,
+		"password" => $password,
+		"admin_level" => "0"
 		);
 		$output = json_encode($returns);
 		echo $output;
@@ -36,7 +48,7 @@
 	else{
 		//echo $data->rowCount();
 		$returns = array(
-			"status" => "failed"
+		"status" => "failed"
 		);
 		$output = json_encode($returns);
 		echo $output;

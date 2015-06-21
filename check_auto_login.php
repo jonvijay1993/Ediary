@@ -25,7 +25,7 @@
 			
 			echo json_encode($output);
 		}
-		else{
+		else if($result = $conn->query($query) or die(mysql_error()) == false){
 			//echo $data->rowCount();
 			$output = array(
 			"status" => "none"
@@ -37,7 +37,7 @@
 	else if($type == "forget_me"){
 		$username = $_GET['username'];
 		$query = 'update user_accounts set auto_login = "no" where username ="'.$username.'"';
-		echo $query;
+		//echo $query;
 		if($result = $conn->query($query) or die(mysql_error()) != false)
 		{
 			echo "forgotten";

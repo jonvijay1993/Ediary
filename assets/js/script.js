@@ -50,7 +50,7 @@
 		$scope.facebookIsReady = false;
 		$scope.user = null;
 		
-		$scope.login = function () {
+		$scope.login_fb = function () {
 			Facebook.login(function(response) {
 				$scope.loginStatus = response.status;
 				$scope.api();
@@ -71,21 +71,23 @@
 			Facebook.api('/me', function(response) {
 				$scope.fb_user_response = response;
 				var url = 'http://localhost:81/route/check_fb.php?first_name=' + response.first_name + '&last_name=' + response.last_name;
+				alert(url);
 				if(Facebook.isReady())
 				{
 					$http.get(url).success(function(val){
-						if(JSON.stringify(val).search("exists") != -1)
+						if(val.status == "exists")
 						{
 							$scope.credentials.username = val.username;
 							$scope.credentials.password = val.password;
 							Session.create($scope.credentials,val.admin_level);
 						}
-						else if(JSON.stringify(val).search("new_user") != -1){
+						else if(val.status == "new_user"){
 							$rootScope.allow_fb_user_to_register = true;
 							$location.path('/register_fb_user');
 						}
-						else
-						alert(val);
+						else{
+							alert(val + "awdawd");
+						}
 					});
 				}
 			});
@@ -101,16 +103,21 @@
 		);
 		
 		$scope.register_fb_user = function(){
-			
-			var url = 'http://localhost:81/route/register_fb_user.php?first_name=' + $scope.fb_user_response.first_name + '&last_name=' + $scope.fb_user_response.last_name + '&username=' + $scope.fb_user_new_username + '&password=fb_user';
-			$http.get(url).success(function(val){
+			alert("1");
+			$scope.url = 'http://localhost:81/route/register_fb_user.php?first_name=' + $scope.fb_user_response.first_name;
+			alert($scope.url);
+			$scope.url = $scope.url + '&last_name=' + $scope.fb_user_response.last_name + '&username=' + $scope.fb_user_new_username + '&password=fb_user';
+			alert($scope.url);
+			$http.get($scope.url).success(function(val){
 				if(val.status == "registered")
 				{
+					alert(val);
 					$scope.credentials.username = val.username;
 					$scope.credentials.password = val.password;
 					Session.create($scope.credentials,val.admin_level);
 				}
 				else{
+					alert(val);
 					$rootScope.allow_fb_user_to_register = false;
 					$location.path('/');
 				}
@@ -132,7 +139,7 @@
 			$http.get(url).success(function(val){
 				if(val == "forgotten"){
 					Session.destroy($rootScope.auto_login_username);
-					$location.path('/normal_login');
+					$location.path('/');
 				}
 				else{
 				}	
@@ -153,7 +160,7 @@
 				}
 				else{
 					alert("Intruder Alert");
-					$location.path('/');
+					$location.path('/normal_login');
 				}
 			}
 			);
@@ -239,17 +246,16 @@
 			});
 		};
 	})
-	.controller('ichangcontroller_home', function($scope,$routeParams,Session) {
+	.controller('ichangcontroller_home', function($scope,$routeParams,Session,$http) {
 		$scope.params = $routeParams;
 		$scope.destroy = function(){
 			Session.destroy(Session.getUser());
 		};
+		$scope.submit_today_note = function(){
+			alert("Hey");
+			
+		}
 	})
-	.controller('ChapterController', function($scope, $routeParams) {
-		$scope.name = "ChapterController";
-		$scope.params = $routeParams;
-	})
-	
 	.config(function($routeProvider, $locationProvider) {
 		$routeProvider
 		.when('/signup', {
@@ -265,7 +271,33 @@
 			controller: 'ichangcontroller_main'
 		})
 		.when('/secure/timeout/:timeout', {
-			templateUrl: 'app/secure.html',
+	templateUrl: 'app/secure.html',
+	controller: 'ichangcontroller_home',
+	resolve:{
+		"check":function(Session,$location){
+			if(Session.isset()){}
+			else{
+				alert("Nope");
+				$location.path('/');
+			}
+		}
+	}
+		})
+		.when('/write_today', {
+			templateUrl: 'app/write_today.html',
+			controller: 'ichangcontroller_home',
+			resolve:{
+				"check":function(Session,$location){
+					if(Session.isset()){}
+					else{
+						alert("Nope");
+						$location.path('/');
+					}
+				}
+			}
+		})
+		.when('/personalize', {
+			templateUrl: 'app/personalize.html',
 			controller: 'ichangcontroller_home',
 			resolve:{
 				"check":function(Session,$location){
